@@ -1,4 +1,4 @@
-# ExesMan - Expense Management System
+# Expense Management System
 
 ExesMan is an automated expense reimbursement system designed to streamline the process of submitting, approving, and tracking company expenses. The system reduces manual effort, improves transparency, and provides flexible approval workflows.
 
