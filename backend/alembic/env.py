@@ -1,11 +1,10 @@
-from logging.config import fileConfig
 import os
+from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from dotenv import load_dotenv
+from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from dotenv import load_dotenv
 
 load_dotenv()
 # this is the Alembic Config object, which provides
@@ -31,8 +30,9 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 from app.db.session import Base
 from app.models.company import *
-from app.models.managers import *
 from app.models.employees import *
+from app.models.expenses import *
+from app.models.managers import *
 
 target_metadata = Base.metadata
 
