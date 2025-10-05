@@ -7,6 +7,7 @@ class ManagersBase(BaseModel):
     m_name: str
     email: EmailStr
     phone: str
+    works_for: UUID
 
 
 # for creating a Manager

@@ -1,5 +1,6 @@
 import logging
 import os
+
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
@@ -18,17 +19,16 @@ if DATABASE_URL is None:
     os._exit(1)
 
 engine = create_engine(DATABASE_URL)
-sessionLocal = sessionmaker(autocommit=False,autoflush=False,bind=engine)
+sessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 print(engine)
 
 Base = declarative_base()
 
+
 def get_db():
     db = sessionLocal()
     try:
         yield db
-    except Exception as e:
-        logger.info(f"{str(e)}")
     finally:
         db.close()

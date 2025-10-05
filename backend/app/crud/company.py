@@ -1,13 +1,11 @@
 from uuid import UUID
 
-from fastapi import Depends, HTTPException, Response, status
+from fastapi import HTTPException, Response, status
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from app.api.v1.auth import get_current_company
-from app.core.security import get_password_hash
 from app.models.company import Company
-from app.schemas.company import CompanyCreate, CompanyRead
+from app.schemas.company import CompanyCreate
 
 
 def create_company(company: CompanyCreate, db: Session) -> Company:
@@ -15,7 +13,8 @@ def create_company(company: CompanyCreate, db: Session) -> Company:
         db_company = Company(
             name=company.name,
             email=company.email,
-            hashed_password=get_password_hash(company.hashed_password),
+            hashed_password=company.hashed_password,
+            currency=company.currency,
         )
 
         db.add(db_company)
@@ -31,13 +30,11 @@ def create_company(company: CompanyCreate, db: Session) -> Company:
         )
 
 
-def get_company(current_company: Company, db: Session) -> dict:
+def get_company(c_id: UUID, db: Session) -> Company:
     try:
-        return {
-            "id": current_company.id,
-            "name": current_company.name,
-            "email": current_company.email,
-        }
+        db_company = db.query(Company).filter(Company.id == c_id).first()
+
+        return db_company
 
     except HTTPException:
         raise
@@ -50,17 +47,15 @@ def get_company(current_company: Company, db: Session) -> dict:
         )
 
 
-def update_company(id: UUID, company: CompanyCreate, db: Session):
+def update_company(c_id: UUID, company: CompanyCreate, db: Session):
     try:
         db_company = (
             db.query(Company)
-            .filter(Company.id == id)
+            .filter(Company.id == c_id)
             .update(
                 {
                     Company.name: company.name,
-                    Company.hashed_password: get_password_hash(
-                        company.hashed_password
-                    ),
+                    Company.hashed_password: company.hashed_password,
                     Company.currency: company.currency,
                 }
             )
@@ -89,13 +84,13 @@ def update_company(id: UUID, company: CompanyCreate, db: Session):
         )
 
 
-def delete_company(c_id: UUID, current_company: Company, db: Session):
+def delete_company(c_id: UUID, db: Session):
     try:
-        if current_company.id != c_id:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="you do not have necessary permissions",
-            )
+        # if current_company.id != c_id:
+        #    raise HTTPException(
+        #       status_code=status.HTTP_401_UNAUTHORIZED,
+        #      detail="you do not have necessary permissions",
+        # )
 
         db_company = db.query(Company).filter(Company.id == c_id).first()
         if not db_company:
